@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": false
+  },
+  "exclude": [
+    "tests",
+    "src/**/*.mock.ts",
+    "src/public/",
+    "jest.setup.ts",
+    "__mocks__"
+  ]
+}

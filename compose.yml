@@ -1,0 +1,33 @@
+services:
+  server:
+    build:
+      context: ./server
+    container_name: "ob-server"
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${SERVER_PORT}
+      MONGO_URI: ${MONGO_URI}
+    depends_on:
+      - mongo
+
+  client:
+    build:
+      context: ./client
+    container_name: "ob-client"
+    ports:
+      - "${CLIENT_PORT}:80"
+    environment:
+      PORT: ${CLIENT_PORT}
+
+  mongo:
+    image: mongo:8.0.3
+    container_name: mongo
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

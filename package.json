@@ -1,0 +1,15 @@
+{
+  "name": "offering-bowl",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "nickpettican",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "husky": "^9.1.6"
+  }
+}
