@@ -1,12 +1,12 @@
 {
-  "compilerOptions": {
-    "outDir": "./dist",
-    "module": "commonjs",
-    "target": "es2020",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
-  },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "jest.setup.ts", "__mocks__"],
-  "exclude": ["node_modules", "dist"]
+    "compilerOptions": {
+        "outDir": "./dist",
+        "module": "commonjs",
+        "target": "es2020",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    },
+    "include": ["src/**/*.ts", "tests/**/*.ts", "jest.setup.ts", "__mocks__"],
+    "exclude": ["node_modules", "dist"]
 }

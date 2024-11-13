@@ -19,18 +19,20 @@ const app = express();
 // Security middleware
 app.use(helmet());
 app.use(
-  cors({
-    origin: ["*"], // TODO: Update with front-end domain
-    methods: ["GET", "POST", "PUT", "DELETE"],
-  }),
+    cors({
+        origin: ["*"], // TODO: Update with front-end domain
+        methods: ["GET", "POST", "PUT", "DELETE"]
+    })
 );
 
 // Rate limiting
+// Default status code is 429
 const limiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 100,
-  message: "Too many requests from this IP, please try again later.",
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 100,
+    message: "Too many requests from this IP, please try again later."
 });
+
 app.use(limiter);
 
 // Logging
@@ -50,24 +52,24 @@ app.use("/", indexRouter);
 
 // Centralized error handling
 interface Error {
-  stack: string;
-  status: number;
-  message: string;
+    stack: string;
+    status: number;
+    message: string;
 }
 
 app.use((err: Error, req: express.Request, res: express.Response) => {
-  const statusCode = err.status || 500;
-  const errorMessage =
-    statusCode === 500 ? "Internal Server Error" : err.message;
+    const statusCode = err.status || 500;
+    const errorMessage =
+        statusCode === 500 ? "Internal Server Error" : err.message;
 
-  // Log errors
-  if (statusCode === 500) {
-    logger.error(err.stack || err.message);
-  } else {
-    logger.warn(err.message);
-  }
+    // Log errors
+    if (statusCode === 500) {
+        logger.error(err.stack || err.message);
+    } else {
+        logger.warn(err.message);
+    }
 
-  res.status(statusCode).json({ error: errorMessage });
+    res.status(statusCode).json({ error: errorMessage });
 });
 
 export default app;
