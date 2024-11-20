@@ -3,6 +3,7 @@
 import http from "http";
 import debugLib from "debug";
 import app from "../app";
+import logger from "../_utils/logger";
 
 const debug = debugLib("offering-bowl:server");
 
@@ -53,11 +54,11 @@ function onError(error: NodeJS.ErrnoException): void {
 
     switch (error.code) {
         case "EACCES":
-            console.error(`${bind} requires elevated privileges`);
+            logger.error(`${bind} requires elevated privileges`);
             process.exit(1);
             break;
         case "EADDRINUSE":
-            console.error(`${bind} is already in use`);
+            logger.error(`${bind} is already in use`);
             process.exit(1);
             break;
         default:

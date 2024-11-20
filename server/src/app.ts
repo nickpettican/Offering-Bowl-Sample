@@ -1,15 +1,17 @@
 import express from "express";
-// import path from "path";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 
-import morganMiddleware from "./middleware/morgan.middleware";
-import logger from "./utils/logger";
+import morganMiddleware from "./_middleware/morgan.middleware";
+import logger from "./_utils/logger";
 
 import indexRouter from "./routes/index";
+import usersRouter from "./routes/users";
+import notFoundRouter from "./routes/404";
+import demoRouter from "./routes/demo";
 
 // Initialize environment variables
 dotenv.config();
@@ -43,12 +45,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Serve static files
-// const staticPath = process.env.STATIC_PATH || path.join(__dirname, "public");
-// app.use(express.static(staticPath));
-
 // Routes
 app.use("/", indexRouter);
+app.use("/users", usersRouter);
+app.use("/demo", demoRouter);
+app.use(notFoundRouter);
 
 // Centralized error handling
 interface Error {

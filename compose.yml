@@ -2,15 +2,20 @@ services:
   server:
     build:
       context: ./server
+      dockerfile: dev.Dockerfile
     container_name: "ob-server"
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: ${SERVER_PORT}
-      MONGO_URI: ${MONGO_URI}
+      DYNAMODB_URI: ${DYNAMODB_URI}
+      AWS_REGION: eu-south-2
+      AWS_ACCESS_KEY_ID: xx
+      AWS_SECRET_ACCESS_KEY: xx
     depends_on:
-      - mongo
+      - dynamodb-local
+    env_file: .env
 
   client:
     build:
@@ -20,14 +25,17 @@ services:
       - "${CLIENT_PORT}:80"
     environment:
       PORT: ${CLIENT_PORT}
+    env_file: .env
 
-  mongo:
-    image: mongo:8.0.3
-    container_name: mongo
+  dynamodb-local:
+    image: amazon/dynamodb-local:2.5.3
+    container_name: dynamodb
     ports:
-      - "${MONGO_PORT}:${MONGO_PORT}"
+      - "${DYNAMODB_PORT}:${DYNAMODB_PORT}"
     volumes:
-      - mongo-data:/data/db
+      - dynamodb-data:/home/dynamodblocal/data
+    working_dir: /home/dynamodblocal
+    env_file: .env
 
 volumes:
-  mongo-data:
+  dynamodb-data:

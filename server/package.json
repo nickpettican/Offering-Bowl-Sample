@@ -19,6 +19,8 @@
         "qc": "npm test && npm run eslint && npm run check-types && npm run prettier"
     },
     "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.687.0",
+        "@aws-sdk/lib-dynamodb": "^3.689.0",
         "@types/cookie-parser": "1.4.7",
         "@types/debug": "4.1.12",
         "@types/morgan": "1.9.9",
