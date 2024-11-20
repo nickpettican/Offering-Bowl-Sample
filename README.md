@@ -18,10 +18,11 @@ Offering Bowl is a platform designed to connect Buddhist monastics with patrons 
 
 - **Backend**: Node.js with Express.js (TypeScript)
 - **Frontend**: Vue.js (TypeScript)
-- **Database**: MongoDB
-- **File Storage**: AWS S3 or Firebase Storage
+- **Database**: DynamoDb
+- **Authentication**: Firebase
+- **File Storage**: AWS S3 and Firebase Storage
 - **Containerization**: Docker
-- **Deployment**: DigitalOcean or AWS ECS
+- **Deployment**: AWS EC2 and CloudFront
 - **CI/CD**: GitHub Actions
 
 ---
@@ -30,13 +31,12 @@ Offering Bowl is a platform designed to connect Buddhist monastics with patrons 
 
 ### Prerequisites
 
-Ensure the following are installed on your system:
+Ensure the following are installed on our system:
 
-- Node.js (tls/jot or v22.11.0+)
-- npm
-- Docker
+- Node.js (tls/jot or v22.11.0 or higher)
+- npm (v10.9.0 or higher)
+- Docker (version 27.3.1 or higher)
 - Git
-- MongoDb (optional)
 
 ### Installation
 
@@ -69,7 +69,7 @@ Ensure the following are installed on your system:
 
 4. **Run the Development Environment**:
 
-    Use Docker Compose to start both the back-end and database services:
+    Use Docker Compose to start the client, back-end and database services:
 
     ```bash
     docker compose up --build
@@ -80,6 +80,22 @@ Ensure the following are installed on your system:
     * Backend: http://localhost:SERVER_PORT
     * Frontend: http://localhost:CLIENT_PORT
 
+### Database set-up
+
+For development we use the Docker image `amazon/dynamodb-local:2.5.3`.
+
+If we run `docker compose` it will automatically be set up.
+
+In dev, however, to create the tables in the database for now we have to use:
+
+```bash
+npx ts-node server/aws/bin/createTables.ts
+```
+
+For the AWS credentials we can add any dummy values. For region I recommend `eu-south-2` and a simple ID and secret like `xx`.
+
+In production the tables will be created by AWS CloudFormation using `server/aws/cloud-formation-template.yml`.
+
 ## Scripts
 
 ### Server (Back-End)
@@ -88,23 +104,25 @@ Run these commands from the `server/` directory:
 
 * **Start Development Server**:
 
+    Dev:
+
     ```bash
     npm run start
     ```
 
-* **Lint Code**:
+* **Quality Control**:
+
+    This will execute tests, eslint, ts type checking and prettier.
 
     ```bash
-    npm run eslint
+    npm run qc
     ```
 
-* **Run Tests**:
+    We can also run each QC step separately (see scripts in `server/package.json`).
 
-    ```bash
-    npm test
-    ```
+* **Build**:
 
-* **Build for Production**:
+    Dev:
 
     ```bash
     npm run build
@@ -139,13 +157,13 @@ Run these commands from the `client/` directory:
 1. Build the Docker images:
 
     ```bash
-    docker compose build
+    docker compose build --no-cache
     ```
 
 2. Start the containers:
 
     ```bash
-    docker compose up
+    docker compose up --build
     ```
 
 3. Stop the containers:
@@ -158,7 +176,7 @@ Run these commands from the `client/` directory:
 
 ### Using GitHub Actions
 
-On each push to the `main` branch:
+On each push and pull-request to the `main` branch:
 
 1. Code is tested and linted.
 
