@@ -5,6 +5,12 @@ import * as UserModel from "../../src/models/users.model"; // mock this
 import { User } from "../../src/_db/schemas";
 
 jest.mock("../../src/models/users.model");
+jest.mock("../../src/_middleware/auth.middleware", () => {
+    return jest.fn((req, res, next) => {
+        req.user = { uid: "toph", email: "toph@beifong.com" };
+        next();
+    });
+});
 
 describe("Users Routes", () => {
     const mockUser: User = {

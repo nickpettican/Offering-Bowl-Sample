@@ -13,6 +13,7 @@ jest.mock("../../src/_db/helpers", () => ({
 }));
 
 describe("Settings Module", () => {
+    const mockGetItem = getItem as jest.Mock;
     const mockPutItem = putItem as jest.Mock;
     const mockQueryItems = queryItems as jest.Mock;
 
@@ -26,7 +27,8 @@ describe("Settings Module", () => {
                 settingsId: "settings123",
                 userId: "aang",
                 country: "Air Nation",
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                blockedUserIds: []
             };
 
             mockPutItem.mockResolvedValueOnce(undefined);
@@ -76,29 +78,32 @@ describe("Settings Module", () => {
 
     describe("updateSettings", () => {
         it("should update a settings successfully with valid data", async () => {
+            const settingsId = "settings123";
             const validSettings: Settings = {
-                settingsId: "settings123",
+                settingsId,
                 userId: "aang",
                 country: "Air Nation",
                 createdAt: new Date().toISOString()
             };
 
+            mockGetItem.mockResolvedValueOnce(validSettings);
             mockPutItem.mockResolvedValueOnce(undefined);
 
             await expect(
-                updateSettings(validSettings)
-            ).resolves.toBeUndefined();
+                updateSettings(settingsId, validSettings)
+            ).resolves.toEqual(validSettings);
             expect(mockPutItem).toHaveBeenCalledWith("Settings", validSettings);
         });
 
         it("should fail when settings data is invalid", async () => {
+            const settingsId = "settings123";
             const invalidSettings: Partial<Settings> = {
-                settingsId: "settings123", // Missing required fields like country, createdAt
+                settingsId, // Missing required fields like country, createdAt
                 userId: "aang"
             };
 
             await expect(
-                updateSettings(invalidSettings as Settings)
+                updateSettings(settingsId, invalidSettings as Settings)
             ).rejects.toThrow(/Invalid settings data/);
 
             expect(mockPutItem).not.toHaveBeenCalled();

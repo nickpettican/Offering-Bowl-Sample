@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import dotenv from "dotenv";
@@ -6,10 +6,14 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 
 import morganMiddleware from "./_middleware/morgan.middleware";
+import authenticate from "./_middleware/auth.middleware";
 import logger from "./_utils/logger";
+import HttpError from "./_utils/httpError";
 
 import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
+import settingsRouter from "./routes/settings";
+import postsRouter from "./routes/posts";
 import notFoundRouter from "./routes/404";
 import demoRouter from "./routes/demo";
 
@@ -47,18 +51,16 @@ app.use(cookieParser());
 
 // Routes
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/users", authenticate, usersRouter);
+app.use("/settings", authenticate, settingsRouter);
+app.use("/posts", authenticate, postsRouter);
 app.use("/demo", demoRouter);
 app.use(notFoundRouter);
 
 // Centralized error handling
-interface Error {
-    stack: string;
-    status: number;
-    message: string;
-}
-
-app.use((err: Error, req: express.Request, res: express.Response) => {
+// For some reason without "next" not all errors are caught
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.status || 500;
     const errorMessage =
         statusCode === 500 ? "Internal Server Error" : err.message;
