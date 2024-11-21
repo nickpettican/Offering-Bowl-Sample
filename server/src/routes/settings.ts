@@ -2,27 +2,31 @@
 /* Catch clause variable type annotation must be 'any' or 'unknown' if specified.ts(1196) */
 
 import express, { Request, Response } from "express";
-import { createUser, getUserById, updateUser } from "../models/users.model";
-import { User } from "../_db/schemas";
+import {
+    createSettings,
+    getSettingsForUser,
+    updateSettings
+} from "../models/settings.model";
+import { Settings } from "../_db/schemas";
 import logger from "../_utils/logger";
 
 const router = express.Router();
 
-// Create a new user (POST /users)
+// Create new settings (POST /settings)
 router.post("/", async (req: Request, res: Response) => {
     try {
-        const user: User = req.body;
+        const settings: Settings = req.body;
 
         // Call the model function to create a user
-        await createUser(user);
+        await createSettings(settings);
 
         res.status(201).json({
             success: true,
-            message: "User created successfully.",
-            user
+            message: "Settings created successfully.",
+            settings
         });
     } catch (error: any) {
-        logger.error("Error creating user:", error.message);
+        logger.error("Error creating settings:", error.message);
         res.status(error.status ?? 500).json({
             success: false,
             error: error.message
@@ -30,29 +34,24 @@ router.post("/", async (req: Request, res: Response) => {
     }
 });
 
-// Get a user by ID (GET /users/:userId)
+// Get settings for a user
 router.get("/:userId", async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
+        const settings = await getSettingsForUser(userId);
 
-        // Call the model function to retrieve the user
-        const user = await getUserById(userId);
-
-        if (!user) {
-            logger.warn("User not found", userId);
+        if (!settings) {
+            logger.warn("Settings not found for user", userId);
             res.status(404).json({
                 success: false,
-                message: "User not found."
+                message: "Settings not found."
             });
             return;
         }
 
-        res.json({
-            success: true,
-            user
-        });
+        res.json({ success: true, settings });
     } catch (error: any) {
-        logger.error("Error retrieving user:", error.message);
+        logger.error("Error creating settings:", error.message);
         res.status(error.status ?? 500).json({
             success: false,
             error: error.message
@@ -60,22 +59,21 @@ router.get("/:userId", async (req: Request, res: Response) => {
     }
 });
 
-// Update a user (PUT /users/:userId)
-router.put("/:userId", async (req: Request, res: Response) => {
+// Update settings
+router.put("/:settingsId", async (req: Request, res: Response) => {
     try {
-        const { userId } = req.params;
-        const updatedData: User = req.body;
+        const { settingsId } = req.params;
+        const updates: Settings = req.body;
 
-        // Call the model function to update the user
-        const updatedUser = await updateUser(userId, updatedData);
+        const updatedSettings = await updateSettings(settingsId, updates);
 
         res.json({
             success: true,
-            message: "User updated successfully.",
-            user: updatedUser
+            message: "Settings updated successfully.",
+            settings: updatedSettings
         });
     } catch (error: any) {
-        logger.error("Error updating user:", error.message);
+        logger.error("Error creating settings:", error.message);
         res.status(error.status ?? 500).json({
             success: false,
             error: error.message

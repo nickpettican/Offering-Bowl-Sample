@@ -1,6 +1,6 @@
-import express from "express";
+import { Request, Response } from "express";
 
-const notFoundRouter = (req: express.Request, res: express.Response) => {
+const notFoundRouter = (req: Request, res: Response) => {
     res.status(404).json({
         error: 404,
         message: "Route not found."

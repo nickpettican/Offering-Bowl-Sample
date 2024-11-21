@@ -1,10 +1,11 @@
 import { validateMedia } from "../_db/validators";
 import { putItem, getItem } from "../_db/helpers";
 import { TABLES, Media } from "../_db/schemas";
+import { UnprocessableEntityError } from "../_utils/httpError";
 
 export const createMedia = async (media: Media) => {
     if (!validateMedia(media)) {
-        throw new Error(
+        throw new UnprocessableEntityError(
             `Invalid media data: ${JSON.stringify(validateMedia.errors)}`
         );
     }
@@ -17,7 +18,7 @@ export const getMediaById = async (mediaId: string) => {
 
 export const updateMedia = async (media: Media) => {
     if (!validateMedia(media)) {
-        throw new Error(
+        throw new UnprocessableEntityError(
             `Invalid media data: ${JSON.stringify(validateMedia.errors)}`
         );
     }

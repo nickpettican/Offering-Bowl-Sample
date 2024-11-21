@@ -1,10 +1,11 @@
 import { validateUser } from "../_db/validators";
 import { putItem, getItem } from "../_db/helpers";
 import { TABLES, User } from "../_db/schemas";
+import { NotFoundError, UnprocessableEntityError } from "../_utils/httpError";
 
 export const createUser = async (user: User) => {
     if (!validateUser(user)) {
-        throw new Error(
+        throw new UnprocessableEntityError(
             `Invalid user data: ${JSON.stringify(validateUser.errors)}`
         );
     }
@@ -17,7 +18,7 @@ export const getUserById = async (userId: string) => {
 
 export const updateUser = async (userId: string, updatedUser: User) => {
     if (!validateUser(updatedUser)) {
-        throw new Error(
+        throw new UnprocessableEntityError(
             `Invalid user data: ${JSON.stringify(validateUser.errors)}`
         );
     }
@@ -25,7 +26,7 @@ export const updateUser = async (userId: string, updatedUser: User) => {
     const existingUser = await getUserById(userId);
 
     if (!existingUser) {
-        throw new Error("User not found.");
+        throw new NotFoundError("User not found.");
     }
 
     await putItem(TABLES.USERS, updatedUser);

@@ -31,9 +31,43 @@ const settingsSchema = {
         state: { type: "string" },
         postcode: { type: "string" },
         anonymous: { type: "boolean" },
+        createdAt: { type: "string", format: "date-time" },
+        blockedUserIds: { type: "array" }
+    },
+    required: ["settingsId", "userId", "country"],
+    additionalProperties: false
+};
+
+// Profile schema
+const profileSchema = {
+    type: "object",
+    properties: {
+        profileId: { type: "string" },
+        userId: { type: "string" },
+        gender: { type: "string", enum: ["male", "female", "other"] },
+        ordinationType: { type: "string", enum: ["novice", "complete"] },
+        ordinationDate: { type: "string", format: "date-time" },
+        tradition: { type: "string" },
+        school: { type: "string" },
+        monastery: { type: "string" },
+        vowPreceptor: { type: "string" },
+        lifestyle: {
+            type: "string",
+            enum: ["anchorite", "cenobite", "gyrovague"]
+        },
         createdAt: { type: "string", format: "date-time" }
     },
-    required: ["userId", "country"],
+    required: [
+        "profileId",
+        "userId",
+        "gender",
+        "ordinationType",
+        "ordinationDate",
+        "tradition",
+        "vowPreceptor",
+        "lifestyle",
+        "createdAt"
+    ],
     additionalProperties: false
 };
 
@@ -122,3 +156,4 @@ export const validateContract = ajv.compile(contractSchema);
 export const validatePost = ajv.compile(postSchema);
 export const validateReceipt = ajv.compile(receiptSchema);
 export const validateMedia = ajv.compile(mediaSchema);
+export const validateProfile = ajv.compile(profileSchema);

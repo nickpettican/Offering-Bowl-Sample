@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* Catch clause variable type annotation must be 'any' or 'unknown' if specified.ts(1196) */
 
 import {
     DynamoDBClient,
@@ -51,6 +52,22 @@ const createTables = async (
             KeySchema: [{ AttributeName: "settingsId", KeyType: "HASH" }],
             AttributeDefinitions: [
                 { AttributeName: "settingsId", AttributeType: "S" },
+                { AttributeName: "userId", AttributeType: "S" }
+            ],
+            GlobalSecondaryIndexes: [
+                {
+                    IndexName: "userId-index",
+                    KeySchema: [{ AttributeName: "userId", KeyType: "HASH" }],
+                    Projection: { ProjectionType: "ALL" }
+                }
+            ],
+            BillingMode: "PAY_PER_REQUEST"
+        },
+        {
+            TableName: "Profile",
+            KeySchema: [{ AttributeName: "profileId", KeyType: "HASH" }],
+            AttributeDefinitions: [
+                { AttributeName: "profileId", AttributeType: "S" },
                 { AttributeName: "userId", AttributeType: "S" }
             ],
             GlobalSecondaryIndexes: [

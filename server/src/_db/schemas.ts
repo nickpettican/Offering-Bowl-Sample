@@ -5,7 +5,8 @@ export const TABLES = {
     POSTS: "Posts",
     RECEIPTS: "Receipts",
     SETTINGS: "Settings",
-    MEDIA: "Media"
+    MEDIA: "Media",
+    PROFILE: "Profile"
 };
 
 export const ActivityTypes = [
@@ -51,6 +52,21 @@ export interface Settings {
     state?: string;
     postcode?: string;
     anonymous?: boolean;
+    blockedUserIds?: object;
+    createdAt: string;
+}
+
+export interface Profile {
+    profileId: string;
+    userId: string;
+    gender: "male" | "female" | "other";
+    ordinationType: "novice" | "complete";
+    ordinationDate: string;
+    tradition: string;
+    school?: string;
+    monastery?: string;
+    vowPreceptor: string;
+    lifestyle: "anchorite" | "cenobite" | "gyrovague";
     createdAt: string;
 }
 

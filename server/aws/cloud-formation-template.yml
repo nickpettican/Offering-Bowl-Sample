@@ -44,6 +44,27 @@ Resources:
                       ProjectionType: ALL
             BillingMode: PAY_PER_REQUEST
 
+    ProfileTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: Profile
+            AttributeDefinitions:
+                - AttributeName: profileId
+                  AttributeType: S
+                - AttributeName: userId
+                  AttributeType: S
+            KeySchema:
+                - AttributeName: profileId
+                  KeyType: HASH
+            GlobalSecondaryIndexes:
+                - IndexName: userId-index
+                  KeySchema:
+                      - AttributeName: userId
+                        KeyType: HASH
+                  Projection:
+                      ProjectionType: ALL
+            BillingMode: PAY_PER_REQUEST
+
     ActivitiesTable:
         Type: AWS::DynamoDB::Table
         Properties:

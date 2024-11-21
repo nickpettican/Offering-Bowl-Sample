@@ -1,10 +1,11 @@
 import { validateContract } from "../_db/validators";
 import { putItem, getItem } from "../_db/helpers";
 import { TABLES, Contract } from "../_db/schemas";
+import { UnprocessableEntityError } from "../_utils/httpError";
 
 export const createContract = async (contract: Contract) => {
     if (!validateContract(contract)) {
-        throw new Error(
+        throw new UnprocessableEntityError(
             `Invalid contract data: ${JSON.stringify(validateContract.errors)}`
         );
     }
@@ -25,7 +26,7 @@ export const getContractsByPatron = async (patronId: string) => {
 
 export const updateContract = async (contract: Contract) => {
     if (!validateContract(contract)) {
-        throw new Error(
+        throw new UnprocessableEntityError(
             `Invalid contract data: ${JSON.stringify(validateContract.errors)}`
         );
     }

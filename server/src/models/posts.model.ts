@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* Catch clause variable type annotation must be 'any' or 'unknown' if specified.ts(1196) */
 
 import { validatePost } from "../_db/validators";
 import { TABLES, Post } from "../_db/schemas";
-import { putItem, queryItems } from "../_db/helpers";
+import { putItem, queryItems, deleteItem } from "../_db/helpers";
+import { UnprocessableEntityError } from "../_utils/httpError";
 
 // Create a new post
 export const createPost = async (post: Post) => {
     if (!validatePost(post)) {
-        throw new Error(
+        throw new UnprocessableEntityError(
             `Invalid post data: ${JSON.stringify(validatePost.errors)}`
         );
     }
@@ -61,4 +63,8 @@ export const getPostsForPatron = async (
     });
 
     return posts;
+};
+
+export const deletePost = async (postId: string) => {
+    return await deleteItem(TABLES.POSTS, { postId });
 };

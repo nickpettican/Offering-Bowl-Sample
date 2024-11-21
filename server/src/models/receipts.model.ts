@@ -1,10 +1,11 @@
 import { validateReceipt } from "../_db/validators";
 import { putItem, getItem } from "../_db/helpers";
 import { TABLES, Receipt } from "../_db/schemas";
+import { UnprocessableEntityError } from "../_utils/httpError";
 
 export const createReceipt = async (receipt: Receipt) => {
     if (!validateReceipt(receipt)) {
-        throw new Error(
+        throw new UnprocessableEntityError(
             `Invalid receipt data: ${JSON.stringify(validateReceipt.errors)}`
         );
     }
