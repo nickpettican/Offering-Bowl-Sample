@@ -1,10 +1,9 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import { homeGet } from "../controllers/index.controller";
 
 const router = express.Router();
 
 /* GET home page. */
-router.get("/", (req: Request, res: Response) => {
-    res.json({ message: "Welcome to Offering Bowl!" });
-});
+router.get("/", homeGet);
 
 export default router;

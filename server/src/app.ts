@@ -14,8 +14,8 @@ import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
 import settingsRouter from "./routes/settings";
 import postsRouter from "./routes/posts";
-import notFoundRouter from "./routes/404";
 import demoRouter from "./routes/demo";
+import notFoundHandler from "./controllers/404.controller";
 
 // Initialize environment variables
 dotenv.config();
@@ -55,7 +55,7 @@ app.use("/users", authenticate, usersRouter);
 app.use("/settings", authenticate, settingsRouter);
 app.use("/posts", authenticate, postsRouter);
 app.use("/demo", demoRouter);
-app.use(notFoundRouter);
+app.use(notFoundHandler);
 
 // Centralized error handling
 // For some reason without "next" not all errors are caught
