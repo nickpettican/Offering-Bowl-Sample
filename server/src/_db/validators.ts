@@ -34,7 +34,7 @@ const settingsSchema = {
         createdAt: { type: "string", format: "date-time" },
         blockedUserIds: { type: "array" }
     },
-    required: ["settingsId", "userId", "country"],
+    required: ["settingsId", "userId", "country", "createdAt"],
     additionalProperties: false
 };
 

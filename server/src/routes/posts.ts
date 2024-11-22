@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* Catch clause variable type annotation must be 'any' or 'unknown' if specified.ts(1196) */
-
 import express from "express";
-import { createPostPost, monasticPostGet, monasticPostDelete } from "../controllers/posts.controller";
+import {
+    createPostPost,
+    monasticPostGet,
+    monasticPostDelete
+} from "../controllers/posts.controller";
 
 const router = express.Router();
 

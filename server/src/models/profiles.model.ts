@@ -1,5 +1,5 @@
 import { validateProfile } from "../_db/validators";
-import { putItem, queryItems } from "../_db/helpers";
+import { getItem, putItem, queryItems } from "../_db/helpers";
 import { TABLES, Profile } from "../_db/schemas";
 import { UnprocessableEntityError, NotFoundError } from "../_utils/httpError";
 
@@ -12,6 +12,10 @@ export const createProfile = async (profile: Profile) => {
     return await putItem(TABLES.PROFILE, profile);
 };
 
+export const getProfileById = async (profileId: string) => {
+    return await getItem(TABLES.PROFILE, { profileId });
+};
+
 export const getProfileForUser = async (userId: string) => {
     return await queryItems(
         TABLES.PROFILE,
@@ -21,12 +25,7 @@ export const getProfileForUser = async (userId: string) => {
     );
 };
 
-/**
- * Since profile is very tightly related to the user
- * we will use userId in this case, otherwise profileId
- * would be the best option
- */
-export const updateProfile = async (
+export const updateProfileForUser = async (
     userId: string,
     updatedProfile: Profile
 ) => {
@@ -37,6 +36,27 @@ export const updateProfile = async (
     }
 
     const existingProfile = await getProfileForUser(userId);
+
+    if (!existingProfile?.length) {
+        throw new NotFoundError("Profile not found.");
+    }
+
+    await putItem(TABLES.PROFILE, updatedProfile);
+
+    return { ...existingProfile[0], ...updatedProfile };
+};
+
+export const updateProfile = async (
+    profileId: string,
+    updatedProfile: Profile
+) => {
+    if (!validateProfile(updatedProfile)) {
+        throw new UnprocessableEntityError(
+            `Invalid profile data: ${JSON.stringify(validateProfile.errors)}`
+        );
+    }
+
+    const existingProfile = await getProfileById(profileId);
 
     if (!existingProfile) {
         throw new NotFoundError("Profile not found.");

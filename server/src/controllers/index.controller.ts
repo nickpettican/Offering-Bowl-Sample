@@ -4,4 +4,3 @@ import { Request, Response } from "express";
 export const homeGet = (req: Request, res: Response) => {
     res.json({ message: "Welcome to Offering Bowl!" });
 };
-
