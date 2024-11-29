@@ -1,5 +1,6 @@
 import morgan, { StreamOptions } from "morgan";
 import logger from "../_utils/logger";
+import envVars from "../_config/env.vars";
 
 // Stream logs through Winston
 const stream: StreamOptions = {
@@ -8,7 +9,7 @@ const stream: StreamOptions = {
 
 // Skip logging for non-meaningful requests
 const skip = () => {
-    const env = process.env.NODE_ENV || "development";
+    const env = envVars.NODE_ENV || "development";
     return env !== "development";
 };
 

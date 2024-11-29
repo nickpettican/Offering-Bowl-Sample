@@ -1,20 +1,21 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
-import dotenv from "dotenv";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 
 import morganMiddleware from "./_middleware/morgan.middleware";
+import authenticate from "./_middleware/auth.middleware";
 import logger from "./_utils/logger";
+import HttpError from "./_utils/httpError";
+import envVars from "./_config/env.vars";
 
 import indexRouter from "./routes/index";
 import usersRouter from "./routes/users";
-import notFoundRouter from "./routes/404";
+import settingsRouter from "./routes/settings";
+import postsRouter from "./routes/posts";
 import demoRouter from "./routes/demo";
-
-// Initialize environment variables
-dotenv.config();
+import notFoundHandler from "./controllers/404.controller";
 
 const app = express();
 
@@ -22,8 +23,14 @@ const app = express();
 app.use(helmet());
 app.use(
     cors({
-        origin: ["*"], // TODO: Update with front-end domain
-        methods: ["GET", "POST", "PUT", "DELETE"]
+        origin: [
+            `http://localhost:${envVars.CLIENT_PORT}`,
+            "https://offeringbowl.org",
+            "https://cuencodeofrendas.org"
+        ], // TODO: Update with front-end domain
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        maxAge: 86400 // 24 hours
     })
 );
 
@@ -47,19 +54,17 @@ app.use(cookieParser());
 
 // Routes
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/users", authenticate, usersRouter);
+app.use("/settings", authenticate, settingsRouter);
+app.use("/posts", postsRouter);
 app.use("/demo", demoRouter);
-app.use(notFoundRouter);
+app.use(notFoundHandler);
 
 // Centralized error handling
-interface Error {
-    stack: string;
-    status: number;
-    message: string;
-}
-
-app.use((err: Error, req: express.Request, res: express.Response) => {
-    const statusCode = err.status || 500;
+// For some reason without "next" not all errors are caught
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+    const statusCode = err.status ?? 500;
     const errorMessage =
         statusCode === 500 ? "Internal Server Error" : err.message;
 
@@ -70,7 +75,7 @@ app.use((err: Error, req: express.Request, res: express.Response) => {
         logger.warn(err.message);
     }
 
-    res.status(statusCode).json({ error: errorMessage });
+    res.status(statusCode).json({ success: false, error: errorMessage });
 });
 
 export default app;

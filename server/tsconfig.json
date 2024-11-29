@@ -5,14 +5,16 @@
         "target": "es2020",
         "strict": true,
         "esModuleInterop": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "typeRoots": ["./node_modules/@types", "./src/_types", "./global.d.ts"]
     },
     "include": [
         "src/**/*.ts",
         "tests/**/*.ts",
         "jest.setup.ts",
         "__mocks__",
-        "aws"
+        "aws",
+        ".env"
     ],
     "exclude": ["node_modules", "dist"]
 }

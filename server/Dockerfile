@@ -18,4 +18,4 @@ RUN npm run build:prod
 EXPOSE ${PORT}
 
 # Run the server
-CMD ["node", "dist/bin/www.js"]
+CMD ["node", "dist/src/bin/www.js"]

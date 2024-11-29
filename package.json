@@ -2,12 +2,21 @@
   "name": "offering-bowl",
   "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "client",
+    "api",
+    "infra",
+    "services"
+  ],
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev": "docker compose --env-file .env up --build",
+    "build:dev": "docker compose --env-file .env build --no-cache",
+    "dev:db": "docker compose --env-file .env up --build dynamodb-local db-initialiser"
   },
   "keywords": [],
-  "author": "nickpettican",
-  "license": "ISC",
+  "author": "Nicolas Pettican",
+  "license": "Apache-2.0",
   "description": "",
   "devDependencies": {
     "husky": "^9.1.6"

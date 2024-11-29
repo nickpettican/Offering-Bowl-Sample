@@ -4,7 +4,7 @@ import { ActivityTypes } from "./schemas";
 const ajv = new Ajv();
 
 // User Schema
-const userSchema = {
+const DEPRECATED_userSchema = {
     type: "object",
     properties: {
         userId: { type: "string" },
@@ -15,6 +15,27 @@ const userSchema = {
         createdAt: { type: "string", format: "date-time" }
     },
     required: ["userId", "role", "name", "email", "createdAt"],
+    additionalProperties: false
+};
+
+// User Schema
+const userSchema = {
+    type: "object",
+    properties: {
+        userId: { type: "string" },
+        role: { type: "string", enum: ["monastic", "patron"] },
+        email: { type: "string", format: "email" },
+        createdAt: { type: "string", format: "date-time" }
+    },
+    required: ["userId", "role", "email", "createdAt"],
+    additionalProperties: false
+};
+
+const userUpdateSchema = {
+    type: "object",
+    properties: {
+        email: userSchema.properties.email
+    },
     additionalProperties: false
 };
 
@@ -31,9 +52,131 @@ const settingsSchema = {
         state: { type: "string" },
         postcode: { type: "string" },
         anonymous: { type: "boolean" },
+        createdAt: { type: "string", format: "date-time" },
+        blockedUserIds: { type: "array" }
+    },
+    required: ["settingsId", "userId", "country", "createdAt"],
+    additionalProperties: false
+};
+
+// Base profile schema for common fields
+const baseProfileSchema = {
+    type: "object",
+    properties: {
+        profileId: { type: "string" },
+        userId: { type: "string" },
+        name: { type: "string", minLength: 1, maxLength: 100 },
+        profilePhotoUrl: { type: "string", format: "uri-reference" },
+        bio: { type: "string", maxLength: 500 }
+    },
+    required: ["profileId", "userId", "name"],
+    additionalProperties: false
+};
+
+// Monastic profile schema
+const monasticProfileSchema = {
+    type: "object",
+    properties: {
+        ...baseProfileSchema.properties,
+        gender: { type: "string", enum: ["male", "female"] },
+        ordinationType: { type: "string", enum: ["novice", "complete"] },
+        ordinationDate: { type: "string", format: "date-time" },
+        tradition: { type: "string", minLength: 1, maxLength: 100 },
+        school: { type: "string", maxLength: 100 },
+        monastery: { type: "string", maxLength: 200 },
+        vowPreceptor: { type: "string", minLength: 1, maxLength: 100 },
+        lifestyle: {
+            type: "string",
+            enum: ["anchorite", "cenobite", "gyrovague"]
+        },
+        isApproved: { type: "boolean" },
         createdAt: { type: "string", format: "date-time" }
     },
-    required: ["userId", "country"],
+    required: [
+        ...baseProfileSchema.required,
+        "gender",
+        "ordinationType",
+        "ordinationDate",
+        "tradition",
+        "vowPreceptor",
+        "lifestyle",
+        "isApproved",
+        "createdAt"
+    ],
+    additionalProperties: false
+};
+
+// Patron profile schema
+const patronProfileSchema = {
+    type: "object",
+    properties: {
+        ...baseProfileSchema.properties,
+        createdAt: { type: "string", format: "date-time" }
+    },
+    required: [...baseProfileSchema.required, "createdAt"],
+    additionalProperties: false
+};
+
+const monasticProfileUpdateSchema = {
+    type: "object",
+    properties: {
+        name: monasticProfileSchema.properties.name,
+        profilePhotoUrl: monasticProfileSchema.properties.profilePhotoUrl,
+        bio: monasticProfileSchema.properties.bio,
+        gender: monasticProfileSchema.properties.gender,
+        ordinationType: monasticProfileSchema.properties.ordinationType,
+        ordinationDate: monasticProfileSchema.properties.ordinationDate,
+        tradition: monasticProfileSchema.properties.tradition,
+        school: monasticProfileSchema.properties.school,
+        monastery: monasticProfileSchema.properties.monastery,
+        vowPreceptor: monasticProfileSchema.properties.vowPreceptor,
+        lifestyle: monasticProfileSchema.properties.lifestyle
+    },
+    additionalProperties: false
+};
+
+const patronProfileUpdateSchema = {
+    type: "object",
+    properties: {
+        name: patronProfileSchema.properties.name,
+        profilePhotoUrl: patronProfileSchema.properties.profilePhotoUrl,
+        bio: patronProfileSchema.properties.bio
+    },
+    additionalProperties: false
+};
+
+// Profile schema
+const DEPRECATED_profileSchema = {
+    type: "object",
+    properties: {
+        profileId: { type: "string" },
+        userId: { type: "string" },
+        gender: { type: "string", enum: ["male", "female", "other"] },
+        ordinationType: { type: "string", enum: ["novice", "complete"] },
+        ordinationDate: { type: "string", format: "date-time" },
+        tradition: { type: "string" },
+        school: { type: "string" },
+        monastery: { type: "string" },
+        vowPreceptor: { type: "string" },
+        lifestyle: {
+            type: "string",
+            enum: ["anchorite", "cenobite", "gyrovague"]
+        },
+        isApproved: { type: "boolean" },
+        createdAt: { type: "string", format: "date-time" }
+    },
+    required: [
+        "profileId",
+        "userId",
+        "gender",
+        "ordinationType",
+        "ordinationDate",
+        "tradition",
+        "vowPreceptor",
+        "lifestyle",
+        "isApproved",
+        "createdAt"
+    ],
     additionalProperties: false
 };
 
@@ -82,10 +225,16 @@ const postSchema = {
         postId: { type: "string" },
         monasticId: { type: "string" },
         mediaId: { type: "string" },
-        content: { type: "string" },
+        content: {
+            type: "string",
+            minLength: 1,
+            maxLength: 5000 // Set a reasonable limit
+            // TODO add pattern
+        },
+        isPublic: { type: "boolean" },
         createdAt: { type: "string", format: "date-time" }
     },
-    required: ["postId", "monasticId", "mediaId", "createdAt"],
+    required: ["postId", "monasticId", "isPublic", "createdAt"],
     additionalProperties: false
 };
 
@@ -115,10 +264,21 @@ const mediaSchema = {
 };
 
 // Export Validators
-export const validateUser = ajv.compile(userSchema);
+export const validateUser = ajv.compile(DEPRECATED_userSchema);
+export const validateUserUpdate = ajv.compile(userUpdateSchema);
 export const validateSettings = ajv.compile(settingsSchema);
 export const validateActivity = ajv.compile(activitySchema);
 export const validateContract = ajv.compile(contractSchema);
 export const validatePost = ajv.compile(postSchema);
 export const validateReceipt = ajv.compile(receiptSchema);
 export const validateMedia = ajv.compile(mediaSchema);
+export const validateProfile = ajv.compile(DEPRECATED_profileSchema);
+export const validateMonasticProfile = ajv.compile(monasticProfileSchema);
+export const validatePatronProfile = ajv.compile(patronProfileSchema);
+export const validateMonasticProfileUpdate = ajv.compile(
+    monasticProfileUpdateSchema
+);
+export const validatePatronProfileUpdate = ajv.compile(
+    patronProfileUpdateSchema
+);
+// TODO add the update validators to avoid changing readonly fields

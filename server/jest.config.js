@@ -1,7 +1,7 @@
 module.exports = {
     preset: "ts-jest",
     testEnvironment: "node",
-    setupFilesAfterEnv: ["./jest.setup.ts"], // Optional
+    setupFiles: ["./jest.setup.ts"], // Optional
     testMatch: ["**/tests/**/*.test.ts"],
     moduleFileExtensions: ["ts", "js"],
     collectCoverage: true,
@@ -11,7 +11,10 @@ module.exports = {
         "node_modules",
         "src/bin",
         "src/_db/helpers.ts",
-        "src/_db/client.ts"
+        "src/_db/client.ts",
+        "src/_utils",
+        "src/_types",
+        "src/_config"
     ],
     coverageDirectory: "coverage",
     verbose: true
