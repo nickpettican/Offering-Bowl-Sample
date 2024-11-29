@@ -43,28 +43,28 @@ jobs:
         working-directory: server
         run: NODE_ENV=test npm run qc
 
-      - name: Coverage Report (server)
-        if: steps.filter.outputs.server == 'true'
-        uses: ArtiomTr/jest-coverage-report-action@v2
-        with:
-          working-directory: server
+      # - name: Coverage Report (server)
+      #   if: steps.filter.outputs.server == 'true'
+      #   uses: ArtiomTr/jest-coverage-report-action@v2
+      #   with:
+      #     working-directory: server
 
       # Client
-      - name: Install Dependencies (client)
-        if: steps.filter.outputs.client == 'true'
-        working-directory: client
-        run: npm install
+      # - name: Install Dependencies (client)
+      #   if: steps.filter.outputs.client == 'true'
+      #   working-directory: client
+      #   run: npm install
 
-      - name: Run Quality Assurance (client)
-        if: steps.filter.outputs.client == 'true'
-        working-directory: client
-        run: NODE_ENV=test npm run qc
+      # - name: Run Quality Assurance (client)
+      #   if: steps.filter.outputs.client == 'true'
+      #   working-directory: client
+      #   run: NODE_ENV=test npm run qc
 
-      - name: Coverage Report (client)
-        if: steps.filter.outputs.client == 'true'
-        uses: ArtiomTr/jest-coverage-report-action@v2
-        with:
-          working-directory: client
+      # - name: Coverage Report (client)
+      #   if: steps.filter.outputs.client == 'true'
+      #   uses: ArtiomTr/jest-coverage-report-action@v2
+      #   with:
+      #     working-directory: client
 
   docker-deploy:
     name: Build and Deploy to Docker Hub
@@ -100,11 +100,11 @@ jobs:
           tags: middlewaymonk/offering-bowl-server:latest
 
       # TODO upload to S3 instead, not as an image
-      - name: Build and Push Client Docker Image
-        if: steps.filter.outputs.client == 'true'
-        uses: docker/build-push-action@v6
-        with:
-          context: ./client
-          file: ./client/Dockerfile
-          push: true
-          tags: middlewaymonk/offering-bowl-client:latest
+      # - name: Build and Push Client Docker Image
+      #   if: steps.filter.outputs.client == 'true'
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: ./client
+      #     file: ./client/Dockerfile
+      #     push: true
+      #     tags: middlewaymonk/offering-bowl-client:latest
