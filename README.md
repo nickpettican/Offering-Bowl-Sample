@@ -18,7 +18,7 @@ Offering Bowl is a platform designed to connect Buddhist monastics with patrons 
 
 - **Backend**: Node.js with Express.js (TypeScript)
 - **Frontend**: Vue.js (TypeScript)
-- **Database**: DynamoDb
+- **Database**: AWS DynamoDb
 - **Authentication**: Firebase
 - **File Storage**: AWS S3 and Firebase Storage
 - **Containerization**: Docker
@@ -74,6 +74,12 @@ Ensure the following are installed on our system:
     Use Docker Compose to start the client, back-end and database services together:
 
     ```bash
+    npm run dev
+    ```
+
+    or
+
+    ```bash
     docker compose --env-file .env up --build
     ```
 
@@ -94,12 +100,16 @@ In dev, however, to create the tables in the database for now we have to use `se
 
 For the AWS credentials we can add any dummy values. For region I recommend `eu-south-2` and a simple ID and secret like `LOCAL`.
 
+---
+
 ## Table Definitions
 
 Table definitions match the production tables defined in the CDK infrastructure. Any changes to table structures should be made in both:
 
 - `infra/lib/constructs/database.ts` (for production)
 - `services/db-initialiser/dynamodb.ts` (for development)
+
+---
 
 ## Scripts
 
@@ -161,6 +171,8 @@ Run these commands from the `client/` directory:
 
     See `client/README.md` for more information.
 
+---
+
 ## Docker
 
 For detailed information about `docker compose` [read the docs](https://docs.docker.com/reference/cli/docker/compose/).
@@ -175,13 +187,13 @@ An important consideration is that of the environment variables.
 
 | Path     | Name       | Purpose                                          | Considerations                                                   |
 |----------|------------|--------------------------------------------------|------------------------------------------------------------------|
-| .        | .env       | for building all apps on docker compose          | can be used by docker compose with --env-file                    |
-| .        | .env.local | for running services locally                     | used by docker compose by default unless --env-file is specified |
+| .        | .env       | for building all apps on docker compose          | used by docker compose by default unless --env-file is specified |
+| .        | .env.local | for running services locally                     | can be used by docker compose with --env-file         |
 | server/  | .env       | for running the app in docker compose            | used by running ob-server container in docker compose            |
-| server/  | .env.local | for running the app locally                      | used by default by node                                          |
+| server/  | .env.local | for running the app locally                      | used by default by node (see server/src/_config/env.vars.ts)                                         |
 | server/  | .env.test  | for running tests, **absolutely necessary**      | |
-| client/  | .env       | for running the app locally (OPTIONAL)           | used by default by vite                                          |
-| client/  | .env.local | for running the app in docker compose (OPTIONAL) | used by running ob-client container in docker compose            |
+| client/  | .env       | for running the app in docker compose (OPTIONAL) | used by running ob-client container in docker compose            |
+| client/  | .env.local | for running the app locally (OPTIONAL)           | used by default by vite                                          |
 
 If environment variables are passed by `--env-file` to `docker compose`, and these variables are mapped into a container using `environment:`, **they will override any variables** in `service/.env` even if they are passed to the container via `env_file:`.
 
@@ -209,6 +221,8 @@ Here we specified `--env-file .env` to make it exclusive for `docker compose`. H
     docker compose down
     ```
 
+---
+
 ## Deployment
 
 ### Using GitHub Actions
@@ -221,15 +235,21 @@ On each push and pull-request to the `main` branch:
 
 The workflow is set up to only build the respective application if there are changes, otherwise these steps are skipped.
 
+---
+
 ## Contributing
 
 We welcome contributions to this non-profit project!
 
 Please commit any pull requests against the `main` branch. Contribution Guidelines will be set up soon.
 
+---
+
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the Apache 2.0 License.
+
+---
 
 ## Contact
 
