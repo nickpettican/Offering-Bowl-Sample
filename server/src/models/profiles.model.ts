@@ -17,12 +17,13 @@ export const getProfileById = async (profileId: string) => {
 };
 
 export const getProfileForUser = async (userId: string) => {
-    return await queryItems(
+    const result = await queryItems(
         TABLES.PROFILE,
         "userId = :userId",
         { ":userId": userId },
-        "userId-index"
+        { indexName: "userId-index" }
     );
+    return result.Items;
 };
 
 export const updateProfileForUser = async (

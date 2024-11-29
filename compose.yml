@@ -3,42 +3,79 @@ services:
     build:
       context: ./server
       dockerfile: dev.Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV}
+        DYNAMODB_URI: ${DYNAMODB_URI}
+        DYNAMODB_PORT: ${DYNAMODB_PORT}
     container_name: "ob-server"
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: ${SERVER_PORT}
+      CLIENT_PORT: ${CLIENT_PORT}
       DYNAMODB_URI: ${DYNAMODB_URI}
+      DYNAMODB_PORT: ${DYNAMODB_PORT}
       AWS_REGION: ${AWS_REGION}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
-      FIREBASE_PRIVATE_KEY_JSON: ${FIREBASE_PRIVATE_KEY_JSON}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
       FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
     depends_on:
-      - dynamodb-local
-    env_file: .env
+      dynamodb-local:
+        condition: service_started
+      db-initialiser:
+        condition: service_completed_successfully
+    env_file: server/.env # these vars will be injected into the running container
 
   client:
     build:
       context: ./client
+      dockerfile: dev.Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
     container_name: "ob-client"
     ports:
       - "${CLIENT_PORT}:80"
     environment:
-      PORT: ${CLIENT_PORT}
-    env_file: .env
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${CLIENT_PORT} # can be used later for nginx
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    depends_on:
+      server:
+        condition: service_started
+    env_file: client/.env # these vars will be injected into the running container
 
   dynamodb-local:
     image: amazon/dynamodb-local:2.5.3
     container_name: dynamodb
     ports:
       - "${DYNAMODB_PORT}:${DYNAMODB_PORT}"
+    environment:
+      DYNAMODB_PORT: ${DYNAMODB_PORT}
     volumes:
-      - dynamodb-data:/home/dynamodblocal/data
+      - /var/lib/docker/volumes/offering-bowl_dynamodb-data/_data:/home/dynamodblocal/data
+    command: [ "-jar", "DynamoDBLocal.jar", "-dbPath", "/home/dynamodblocal/data" ]
     working_dir: /home/dynamodblocal
-    env_file: .env
+    healthcheck:
+      test: [ "CMD-SHELL", 'if [ "$(curl -s -o /dev/null -I -w ''%{http_code}'' http://localhost:8000)" == "400" ]; then exit 0; else exit 1; fi' ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-volumes:
-  dynamodb-data:
+  db-initialiser:
+    build:
+      context: ./services/db-initialiser
+    container_name: "db-initialiser"
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      DYNAMODB_URI: ${DYNAMODB_URI}
+      DYNAMODB_PORT: ${DYNAMODB_PORT}
+    command: [ "npx", "ts-node", "./setupLocalDb.ts" ]

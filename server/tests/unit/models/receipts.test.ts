@@ -1,8 +1,11 @@
-import { createReceipt, getReceiptById } from "../../src/models/receipts.model";
-import { putItem, getItem } from "../../src/_db/helpers";
-import { Receipt } from "../../src/_db/schemas";
+import {
+    createReceipt,
+    getReceiptById
+} from "../../../src/models/receipts.model";
+import { putItem, getItem } from "../../../src/_db/helpers";
+import { Receipt } from "../../../src/_db/schemas";
 
-jest.mock("../../src/_db/helpers", () => ({
+jest.mock("../../../src/_db/helpers", () => ({
     putItem: jest.fn(),
     getItem: jest.fn()
 }));
@@ -10,6 +13,10 @@ jest.mock("../../src/_db/helpers", () => ({
 describe("Receipt Module", () => {
     const mockPutItem = putItem as jest.Mock;
     const mockGetItem = getItem as jest.Mock;
+
+    const mockPutCommandOutput = {
+        $metadata: { httpStatusCode: 200 }
+    };
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -24,9 +31,11 @@ describe("Receipt Module", () => {
                 issuedAt: new Date().toISOString()
             };
 
-            mockPutItem.mockResolvedValueOnce(undefined);
+            mockPutItem.mockResolvedValueOnce(mockPutCommandOutput);
 
-            await expect(createReceipt(validReceipt)).resolves.toBeUndefined();
+            await expect(createReceipt(validReceipt)).resolves.toEqual(
+                mockPutCommandOutput
+            );
             expect(mockPutItem).toHaveBeenCalledWith("Receipts", validReceipt);
         });
 

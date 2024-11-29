@@ -14,8 +14,9 @@ node_modules/
 
 # local env files
 *.env
-.env.local
-.env.*.local
+*.env.*
+!.env.example
+!.env.test
 
 # Log files
 npm-debug.log*

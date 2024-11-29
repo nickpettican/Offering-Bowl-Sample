@@ -2,8 +2,15 @@
   "name": "offering-bowl",
   "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "client",
+    "api",
+    "infra"
+  ],
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev": "docker compose --env-file .env up --build",
+    "build:dev": "docker compose --env-file .env build --no-cache"
   },
   "keywords": [],
   "author": "nickpettican",

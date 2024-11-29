@@ -4,16 +4,20 @@ import {
     settingsGet,
     settingsUpdate
 } from "../controllers/settings.controller";
+import {
+    fetchUserFromDb,
+    restrictToOwner
+} from "../_middleware/user.middleware";
 
 const router = express.Router();
 
 // POST create new settings
-router.post("/", createSettingsPost);
+router.post("/", fetchUserFromDb, restrictToOwner, createSettingsPost);
 
 // GET settings for a user
-router.get("/:userId", settingsGet);
+router.get("/:userId", restrictToOwner, settingsGet);
 
 // UPDATE settings
-router.put("/:settingsId", settingsUpdate);
+router.put("/:settingsId", fetchUserFromDb, restrictToOwner, settingsUpdate);
 
 export default router;

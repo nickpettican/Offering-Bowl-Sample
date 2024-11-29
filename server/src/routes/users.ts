@@ -4,6 +4,7 @@ import {
     userGet,
     userUpdate
 } from "../controllers/users.controller";
+import { restrictToOwner } from "../_middleware/user.middleware";
 
 const router = express.Router();
 
@@ -11,9 +12,9 @@ const router = express.Router();
 router.post("/", createUserPost);
 
 // GET a user by ID
-router.get("/:userId", userGet);
+router.get("/:userId", restrictToOwner, userGet);
 
 // UPDATE a user
-router.put("/:userId", userUpdate);
+router.put("/:userId", restrictToOwner, userUpdate);
 
 export default router;

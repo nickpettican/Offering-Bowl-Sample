@@ -6,8 +6,8 @@
     "exclude": [
         "tests",
         "src/**/*.mock.ts",
-        "src/public/",
         "jest.setup.ts",
+        "jest.config.ts",
         "__mocks__"
     ]
 }

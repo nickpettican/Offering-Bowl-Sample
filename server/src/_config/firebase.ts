@@ -1,11 +1,13 @@
 import admin from "firebase-admin";
+import envVars from "../_config/env.vars";
 
-const privateKeyJson = JSON.parse(process.env.FIREBASE_PRIVATE_KEY_JSON || "");
+const encryptedPrivateKey = envVars.FIREBASE_PRIVATE_KEY || "";
+const privateKey = Buffer.from(encryptedPrivateKey, "base64").toString();
 
 const firebaseConfig: admin.ServiceAccount = {
-    projectId: process.env.FIREBASE_PROJECT_ID || "",
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL || "",
-    privateKey: privateKeyJson.privateKey?.replace(/\\n/g, "\n") || ""
+    projectId: envVars.FIREBASE_PROJECT_ID || "",
+    clientEmail: envVars.FIREBASE_CLIENT_EMAIL || "",
+    privateKey
 };
 
 if (

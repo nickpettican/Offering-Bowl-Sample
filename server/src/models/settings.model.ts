@@ -17,12 +17,14 @@ export const getSettingsById = async (settingsId: string) => {
 };
 
 export const getSettingsForUser = async (userId: string) => {
-    return await queryItems(
+    const result = await queryItems(
         TABLES.SETTINGS,
         "userId = :userId",
         { ":userId": userId },
-        "userId-index"
+        { indexName: "userId-index" }
     );
+
+    return result.Items;
 };
 
 export const updateSettings = async (

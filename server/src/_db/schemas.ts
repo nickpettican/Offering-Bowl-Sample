@@ -6,7 +6,7 @@ export const TABLES = {
     RECEIPTS: "Receipts",
     SETTINGS: "Settings",
     MEDIA: "Media",
-    PROFILE: "Profile"
+    PROFILE: "Profiles"
 };
 
 export const ActivityTypes = [
@@ -42,6 +42,14 @@ export interface User {
     createdAt: string;
 }
 
+// TODO add later
+// export interface User {
+//     userId: string;
+//     role: "monastic" | "patron";
+//     email: string;
+//     createdAt: string;
+// }
+
 export interface Settings {
     settingsId: string;
     userId: string;
@@ -56,6 +64,33 @@ export interface Settings {
     createdAt: string;
 }
 
+// TODO split profile into two, update tests
+interface BaseProfile {
+    profileId: string;
+    userId: string;
+    name: string;
+    profilePhotoUrl?: string;
+    bio?: string;
+}
+
+export interface MonasticProfile extends BaseProfile {
+    gender: "male" | "female";
+    ordinationType: "novice" | "complete";
+    ordinationDate: string;
+    tradition: string;
+    school?: string;
+    monastery?: string;
+    vowPreceptor: string;
+    lifestyle: "anchorite" | "cenobite" | "gyrovague";
+    isApproved: boolean;
+    createdAt: string;
+}
+
+export interface PatronProfile extends BaseProfile {
+    createdAt: string;
+}
+
+// DEPRECATED
 export interface Profile {
     profileId: string;
     userId: string;
@@ -67,6 +102,7 @@ export interface Profile {
     monastery?: string;
     vowPreceptor: string;
     lifestyle: "anchorite" | "cenobite" | "gyrovague";
+    isApproved: boolean;
     createdAt: string;
 }
 
@@ -91,6 +127,7 @@ export interface Contract {
 export interface Post {
     postId: string;
     monasticId: string;
+    isPublic: boolean;
     mediaId?: string;
     content?: string;
     createdAt: string;

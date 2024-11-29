@@ -2,11 +2,11 @@ import {
     createSettings,
     getSettingsForUser,
     updateSettings
-} from "../../src/models/settings.model";
-import { putItem, getItem, queryItems } from "../../src/_db/helpers";
-import { Settings } from "../../src/_db/schemas";
+} from "../../../src/models/settings.model";
+import { putItem, getItem, queryItems } from "../../../src/_db/helpers";
+import { Settings } from "../../../src/_db/schemas";
 
-jest.mock("../../src/_db/helpers", () => ({
+jest.mock("../../../src/_db/helpers", () => ({
     putItem: jest.fn(),
     getItem: jest.fn(),
     queryItems: jest.fn()
@@ -16,6 +16,10 @@ describe("Settings Module", () => {
     const mockGetItem = getItem as jest.Mock;
     const mockPutItem = putItem as jest.Mock;
     const mockQueryItems = queryItems as jest.Mock;
+
+    const mockPutCommandOutput = {
+        $metadata: { httpStatusCode: 200 }
+    };
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -31,11 +35,11 @@ describe("Settings Module", () => {
                 blockedUserIds: []
             };
 
-            mockPutItem.mockResolvedValueOnce(undefined);
+            mockPutItem.mockResolvedValueOnce(mockPutCommandOutput);
 
-            await expect(
-                createSettings(validSettings)
-            ).resolves.toBeUndefined();
+            await expect(createSettings(validSettings)).resolves.toEqual(
+                mockPutCommandOutput
+            );
             expect(mockPutItem).toHaveBeenCalledWith("Settings", validSettings);
         });
 
@@ -56,22 +60,24 @@ describe("Settings Module", () => {
     describe("getSettingsForUser", () => {
         it("should retrieve a settings by user ID", async () => {
             const userId = "aang";
-            const mockSettings: Settings = {
-                userId,
-                settingsId: "setting123",
-                country: "Air Nation",
-                createdAt: new Date().toISOString()
-            };
+            const mockSettings: Settings[] = [
+                {
+                    userId,
+                    settingsId: "setting123",
+                    country: "Air Nation",
+                    createdAt: new Date().toISOString()
+                }
+            ];
 
-            mockQueryItems.mockResolvedValueOnce(mockSettings);
+            mockQueryItems.mockResolvedValueOnce({ Items: [mockSettings] });
 
-            const result = await getSettingsForUser(userId);
-            expect(result).toEqual(mockSettings);
+            const settings = await getSettingsForUser(userId);
+            expect(settings?.pop()).toEqual(mockSettings);
             expect(mockQueryItems).toHaveBeenCalledWith(
                 "Settings",
                 "userId = :userId",
                 { ":userId": userId },
-                "userId-index"
+                { indexName: "userId-index" }
             );
         });
     });
@@ -87,7 +93,7 @@ describe("Settings Module", () => {
             };
 
             mockGetItem.mockResolvedValueOnce(validSettings);
-            mockPutItem.mockResolvedValueOnce(undefined);
+            mockPutItem.mockResolvedValueOnce(mockPutCommandOutput);
 
             await expect(
                 updateSettings(settingsId, validSettings)

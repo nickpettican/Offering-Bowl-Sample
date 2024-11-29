@@ -2,11 +2,11 @@ import {
     createUser,
     getUserById,
     updateUser
-} from "../../src/models/users.model";
-import { putItem, getItem } from "../../src/_db/helpers";
-import { User } from "../../src/_db/schemas";
+} from "../../../src/models/users.model";
+import { putItem, getItem } from "../../../src/_db/helpers";
+import { User } from "../../../src/_db/schemas";
 
-jest.mock("../../src/_db/helpers", () => ({
+jest.mock("../../../src/_db/helpers", () => ({
     putItem: jest.fn(),
     getItem: jest.fn()
 }));
@@ -14,6 +14,10 @@ jest.mock("../../src/_db/helpers", () => ({
 describe("Users Module", () => {
     const mockPutItem = putItem as jest.Mock;
     const mockGetItem = getItem as jest.Mock;
+
+    const mockPutCommandOutput = {
+        $metadata: { httpStatusCode: 200 }
+    };
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -29,9 +33,11 @@ describe("Users Module", () => {
                 createdAt: new Date().toISOString()
             };
 
-            mockPutItem.mockResolvedValueOnce(undefined);
+            mockPutItem.mockResolvedValueOnce(mockPutCommandOutput);
 
-            await expect(createUser(validUser)).resolves.toBeUndefined();
+            await expect(createUser(validUser)).resolves.toEqual(
+                mockPutCommandOutput
+            );
             expect(mockPutItem).toHaveBeenCalledWith("Users", validUser);
         });
 
@@ -44,9 +50,11 @@ describe("Users Module", () => {
                 createdAt: new Date().toISOString()
             };
 
-            mockPutItem.mockResolvedValueOnce(undefined);
+            mockPutItem.mockResolvedValueOnce(mockPutCommandOutput);
 
-            await expect(createUser(validUser)).resolves.toBeUndefined();
+            await expect(createUser(validUser)).resolves.toEqual(
+                mockPutCommandOutput
+            );
             expect(mockPutItem).toHaveBeenCalledWith("Users", validUser);
         });
 
@@ -98,7 +106,7 @@ describe("Users Module", () => {
             };
 
             mockGetItem.mockResolvedValueOnce(validUser);
-            mockPutItem.mockResolvedValueOnce(undefined);
+            mockPutItem.mockResolvedValueOnce(mockPutCommandOutput);
 
             await expect(updateUser(userId, validUser)).resolves.toEqual(
                 validUser

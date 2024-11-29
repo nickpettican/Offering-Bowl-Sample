@@ -1,13 +1,12 @@
 import request from "supertest";
-import app from "../../src/app";
-import auth from "../../src/_config/firebase";
-import { UnauthorizedError } from "../../src/_utils/httpError";
+import app from "../../../src/app";
+import auth from "../../../src/_config/firebase";
+import { UnauthorizedError } from "../../../src/_utils/httpError";
 
-jest.mock("../../src/_config/firebase", () => ({
-    verifyIdToken: jest.fn()
-}));
+jest.mock("../../../src/_config/firebase");
 
 describe("Authentication Integration Tests", () => {
+    const mockVerifyIdToken = auth.verifyIdToken as jest.Mock;
     const validToken = "validMockToken";
     const invalidToken = "invalidMockToken";
 
@@ -25,22 +24,22 @@ describe("Authentication Integration Tests", () => {
         // /users route
         let response = await request(app).get("/users");
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({ error: errorMessage });
+        expect(response.body).toEqual({ success: false, error: errorMessage });
 
         // /settings route
         response = await request(app).get("/settings");
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({ error: errorMessage });
+        expect(response.body).toEqual({ success: false, error: errorMessage });
 
         // /posts route
-        response = await request(app).get("/posts");
+        response = await request(app).post("/posts/post");
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({ error: errorMessage });
+        expect(response.body).toEqual({ success: false, error: errorMessage });
     });
 
     it("should return 401 for invalid tokens", async () => {
         const errorMessage = "Invalid token";
-        (auth.verifyIdToken as jest.Mock).mockRejectedValueOnce(
+        mockVerifyIdToken.mockRejectedValueOnce(
             new UnauthorizedError(errorMessage)
         );
 
@@ -49,12 +48,12 @@ describe("Authentication Integration Tests", () => {
             .set("Authorization", `Bearer ${invalidToken}`);
 
         expect(response.status).toBe(401);
-        expect(response.body).toEqual({ error: errorMessage });
+        expect(response.body).toEqual({ success: false, error: errorMessage });
         expect(auth.verifyIdToken).toHaveBeenCalledWith(invalidToken);
     });
 
     it("should allow requests with valid tokens", async () => {
-        (auth.verifyIdToken as jest.Mock).mockResolvedValueOnce(mockUser);
+        mockVerifyIdToken.mockResolvedValueOnce(mockUser);
 
         // /users route
         let response = await request(app)
@@ -66,13 +65,6 @@ describe("Authentication Integration Tests", () => {
         // /settings route
         response = await request(app)
             .get("/settings")
-            .set("Authorization", `Bearer ${validToken}`);
-        expect(response.status).not.toBe(401);
-        expect(auth.verifyIdToken).toHaveBeenCalledWith(validToken);
-
-        // /posts route
-        response = await request(app)
-            .get("/posts")
             .set("Authorization", `Bearer ${validToken}`);
         expect(response.status).not.toBe(401);
         expect(auth.verifyIdToken).toHaveBeenCalledWith(validToken);

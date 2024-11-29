@@ -4,7 +4,12 @@ import {
     GetCommand,
     PutCommand,
     DeleteCommand,
-    QueryCommand
+    QueryCommand,
+    ScanCommand,
+    QueryCommandOutput,
+    QueryCommandInput,
+    ScanCommandInput,
+    ScanCommandOutput
 } from "@aws-sdk/lib-dynamodb";
 import dynamoDb from "./client";
 
@@ -47,15 +52,54 @@ export const queryItems = async (
     tableName: string,
     expression: string,
     values: Record<string, any>,
-    indexName?: string
-) => {
-    const result = await dynamoDb.send(
-        new QueryCommand({
-            TableName: tableName,
-            KeyConditionExpression: expression,
-            ExpressionAttributeValues: values,
-            IndexName: indexName
-        })
-    );
-    return result.Items;
+    optionalParams?: {
+        indexName?: string;
+        scanIndexForward?: boolean;
+        totalSegments?: number;
+        limit?: number;
+        exclusiveStartKey?: Record<string, any>;
+    }
+): Promise<QueryCommandOutput> => {
+    const params: QueryCommandInput = {
+        TableName: tableName,
+        KeyConditionExpression: expression,
+        ExpressionAttributeValues: values,
+        IndexName: optionalParams?.indexName,
+        ScanIndexForward: optionalParams?.scanIndexForward,
+        Limit: optionalParams?.limit,
+        ExclusiveStartKey: optionalParams?.exclusiveStartKey
+    };
+    const result = await dynamoDb.send(new QueryCommand(params));
+    return result;
+};
+
+/**
+ * Most expensive operation, use wisely
+ */
+export const scanItems = async (
+    tableName: string,
+    expression: string,
+    values: Record<string, any>,
+    optionalParams?: {
+        indexName?: string;
+        segment?: number;
+        totalSegments?: number;
+        limit?: number;
+        projectionExpression?: string;
+        exclusiveStartKey?: Record<string, any>;
+    }
+): Promise<ScanCommandOutput> => {
+    const params: ScanCommandInput = {
+        TableName: tableName,
+        FilterExpression: expression,
+        ExpressionAttributeValues: values,
+        IndexName: optionalParams?.indexName,
+        Segment: optionalParams?.segment,
+        TotalSegments: optionalParams?.totalSegments,
+        Limit: optionalParams?.limit,
+        ProjectionExpression: optionalParams?.projectionExpression,
+        ExclusiveStartKey: optionalParams?.exclusiveStartKey
+    };
+    const result = await dynamoDb.send(new ScanCommand(params));
+    return result;
 };

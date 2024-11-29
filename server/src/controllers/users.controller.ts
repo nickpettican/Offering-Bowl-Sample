@@ -20,10 +20,10 @@ export const createUserPost = async (req: Request, res: Response) => {
             user
         });
     } catch (error: any) {
-        logger.error("Error creating user:", error.message);
+        logger.error(`Error creating user: ${error.message ?? error}`);
         res.status(error.status ?? 500).json({
             success: false,
-            error: error.message
+            error: error.message ?? error
         });
     }
 };
@@ -37,7 +37,7 @@ export const userGet = async (req: Request, res: Response) => {
         const user = await getUserById(userId);
 
         if (!user) {
-            logger.warn("User not found", userId);
+            logger.warn(`User not found ${userId}`);
             res.status(404).json({
                 success: false,
                 message: "User not found."
@@ -50,10 +50,10 @@ export const userGet = async (req: Request, res: Response) => {
             user
         });
     } catch (error: any) {
-        logger.error("Error retrieving user:", error.message);
+        logger.error(`Error fetching user: ${error.message || error}`);
         res.status(error.status ?? 500).json({
             success: false,
-            error: error.message
+            error: error.message ?? error
         });
     }
 };
@@ -73,10 +73,10 @@ export const userUpdate = async (req: Request, res: Response) => {
             user: updatedUser
         });
     } catch (error: any) {
-        logger.error("Error updating user:", error.message);
+        logger.error(`Error updating user: ${error.message ?? error}`);
         res.status(error.status ?? 500).json({
             success: false,
-            error: error.message
+            error: error.message ?? error
         });
     }
 };

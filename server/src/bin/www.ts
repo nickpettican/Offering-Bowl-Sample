@@ -4,13 +4,14 @@ import http from "http";
 import debugLib from "debug";
 import app from "../app";
 import logger from "../_utils/logger";
+import envVars from "../_config/env.vars";
 
 const debug = debugLib("offering-bowl:server");
 
 /**
  * Get port from environment and store in Express.
  */
-const port = normalizePort(process.env.PORT || "3000");
+const port = normalizePort(envVars.PORT || "3000");
 app.set("port", port);
 
 /**

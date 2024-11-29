@@ -67,13 +67,17 @@ Ensure the following are installed on our system:
 
     Create a `.env` file in the root directory and populate it based on the `.env.example`.
 
+    Bear in mind that for `docker compose` we use `.env`.
+
 4. **Run the Development Environment**:
 
-    Use Docker Compose to start the client, back-end and database services:
+    Use Docker Compose to start the client, back-end and database services together:
 
     ```bash
-    docker compose up --build
+    docker compose --env-file .env up --build
     ```
+
+    Otherwise see the **scripts** section for more information.
 
 5. **Access the Application**:
 
@@ -86,15 +90,16 @@ For development we use the Docker image `amazon/dynamodb-local:2.5.3`.
 
 If we run `docker compose` it will automatically be set up.
 
-In dev, however, to create the tables in the database for now we have to use:
+In dev, however, to create the tables in the database for now we have to use `services/db-initialiser`. See the README there for more information.
 
-```bash
-npx ts-node server/aws/bin/createTables.ts
-```
+For the AWS credentials we can add any dummy values. For region I recommend `eu-south-2` and a simple ID and secret like `LOCAL`.
 
-For the AWS credentials we can add any dummy values. For region I recommend `eu-south-2` and a simple ID and secret like `xx`.
+## Table Definitions
 
-In production the tables will be created by AWS CloudFormation using `server/aws/cloud-formation-template.yml`.
+Table definitions match the production tables defined in the CDK infrastructure. Any changes to table structures should be made in both:
+
+- `infra/lib/constructs/database.ts` (for production)
+- `services/db-initialiser/dynamodb.ts` (for development)
 
 ## Scripts
 
@@ -132,38 +137,70 @@ Run these commands from the `server/` directory:
 
 Run these commands from the `client/` directory:
 
-* **Start Development Server**:
+* **Compile and Hot-Reload for Development**:
+
+    Dev:
 
     ```bash
-    npm run serve
+    npm run dev
     ```
 
-* **Lint Code**:
-
-    ```bash
-    npm run lint
-    ```
-
-* **Build for Production**:
+* **Type-Check, Compile and Minify for Production**:
 
     ```bash
     npm run build
     ```
 
+* **Run Unit Tests with [Vitest](https://vitest.dev/)**:
+
+    ```bash
+    npm run test:unit
+    ```
+
+* **Run End-to-End Tests**:
+
+    See `client/README.md` for more information.
+
 ## Docker
 
+For detailed information about `docker compose` [read the docs](https://docs.docker.com/reference/cli/docker/compose/).
+
+If using `docker compose` bear in mind that each service communicates with each other not via `localhost` but by the name of the respective container. For instance **ob-server** will find **dynamodb** under `http://dynamodb:PORT`.
+
+Use `.env` for this (see the `compose.yml` file).
+
+### Docker compose env vars
+
+An important consideration is that of the environment variables.
+
+| Path     | Name       | Purpose                                          | Considerations                                                   |
+|----------|------------|--------------------------------------------------|------------------------------------------------------------------|
+| .        | .env       | for building all apps on docker compose          | can be used by docker compose with --env-file                    |
+| .        | .env.local | for running services locally                     | used by docker compose by default unless --env-file is specified |
+| server/  | .env       | for running the app in docker compose            | used by running ob-server container in docker compose            |
+| server/  | .env.local | for running the app locally                      | used by default by node                                          |
+| server/  | .env.test  | for running tests, **absolutely necessary**      | |
+| client/  | .env       | for running the app locally (OPTIONAL)           | used by default by vite                                          |
+| client/  | .env.local | for running the app in docker compose (OPTIONAL) | used by running ob-client container in docker compose            |
+
+If environment variables are passed by `--env-file` to `docker compose`, and these variables are mapped into a container using `environment:`, **they will override any variables** in `service/.env` even if they are passed to the container via `env_file:`.
+
 ### Build and Run Locally
+
+Without adding the `--env-file` option the `.env` file in the parent directory will be used for the environment building the containers and the variables here can be passed to the container through `environment:` in `compose.yml`.
+
+Here we specified `--env-file .env` to make it exclusive for `docker compose`. However, this is optional.
 
 1. Build the Docker images:
 
     ```bash
-    docker compose build --no-cache
+    docker compose --env-file .env build --no-cache
     ```
 
 2. Start the containers:
 
     ```bash
-    docker compose up --build
+    docker compose --env-file .env up --build
     ```
 
 3. Stop the containers:
@@ -181,6 +218,8 @@ On each push and pull-request to the `main` branch:
 1. Code is tested and linted.
 
 2. Docker images are built and pushed to the container registry.
+
+The workflow is set up to only build the respective application if there are changes, otherwise these steps are skipped.
 
 ## Contributing
 

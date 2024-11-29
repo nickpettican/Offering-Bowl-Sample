@@ -24,10 +24,10 @@ export const createSettingsPost = async (req: Request, res: Response) => {
             settings
         });
     } catch (error: any) {
-        logger.error("Error creating settings:", error.message);
+        logger.error(`Error creating settings: ${error.message ?? error}`);
         res.status(error.status ?? 500).json({
             success: false,
-            error: error.message
+            error: error.message ?? error
         });
     }
 };
@@ -38,8 +38,8 @@ export const settingsGet = async (req: Request, res: Response) => {
         const { userId } = req.params;
         const settings = await getSettingsForUser(userId);
 
-        if (!settings) {
-            logger.warn("Settings not found for user", userId);
+        if (!settings?.length) {
+            logger.warn(`Settings not found for user ${userId}`);
             res.status(404).json({
                 success: false,
                 message: "Settings not found."
@@ -47,12 +47,12 @@ export const settingsGet = async (req: Request, res: Response) => {
             return;
         }
 
-        res.json({ success: true, settings });
+        res.json({ success: true, settings: settings[0] });
     } catch (error: any) {
-        logger.error("Error creating settings:", error.message);
+        logger.error(`Error getting settings: ${error.message ?? error}`);
         res.status(error.status ?? 500).json({
             success: false,
-            error: error.message
+            error: error.message ?? error
         });
     }
 };
@@ -71,10 +71,10 @@ export const settingsUpdate = async (req: Request, res: Response) => {
             settings: updatedSettings
         });
     } catch (error: any) {
-        logger.error("Error creating settings:", error.message);
+        logger.error(`Error updating settings: ${error.message ?? error}`);
         res.status(error.status ?? 500).json({
             success: false,
-            error: error.message
+            error: error.message ?? error
         });
     }
 };

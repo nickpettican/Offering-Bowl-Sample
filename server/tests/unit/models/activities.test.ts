@@ -1,13 +1,17 @@
-import { logActivity } from "../../src/models/activities.model";
-import { Activity } from "../../src/_db/schemas";
-import { putItem } from "../../src/_db/helpers";
+import { logActivity } from "../../../src/models/activities.model";
+import { Activity } from "../../../src/_db/schemas";
+import { putItem } from "../../../src/_db/helpers";
 
-jest.mock("../../src/_db/helpers", () => ({
+jest.mock("../../../src/_db/helpers", () => ({
     putItem: jest.fn()
 }));
 
 describe("logActivity", () => {
     const mockPutItem = putItem as jest.Mock;
+
+    const mockPutCommandOutput = {
+        $metadata: { httpStatusCode: 200 }
+    };
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -22,9 +26,11 @@ describe("logActivity", () => {
             createdAt: new Date().toISOString()
         };
 
-        mockPutItem.mockResolvedValueOnce(undefined); // Simulate successful DB operation
+        mockPutItem.mockResolvedValueOnce(mockPutCommandOutput); // Simulate successful DB operation
 
-        await expect(logActivity(validActivity)).resolves.toBeUndefined();
+        await expect(logActivity(validActivity)).resolves.toEqual(
+            mockPutCommandOutput
+        );
         expect(mockPutItem).toHaveBeenCalledWith("Activities", validActivity);
     });
 

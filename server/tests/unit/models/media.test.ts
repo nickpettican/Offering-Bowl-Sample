@@ -2,11 +2,11 @@ import {
     createMedia,
     getMediaById,
     updateMedia
-} from "../../src/models/media.model";
-import { putItem, getItem } from "../../src/_db/helpers";
-import { Media } from "../../src/_db/schemas";
+} from "../../../src/models/media.model";
+import { putItem, getItem } from "../../../src/_db/helpers";
+import { Media } from "../../../src/_db/schemas";
 
-jest.mock("../../src/_db/helpers", () => ({
+jest.mock("../../../src/_db/helpers", () => ({
     putItem: jest.fn(),
     getItem: jest.fn()
 }));
@@ -14,6 +14,10 @@ jest.mock("../../src/_db/helpers", () => ({
 describe("Media Module", () => {
     const mockPutItem = putItem as jest.Mock;
     const mockGetItem = getItem as jest.Mock;
+
+    const mockPutCommandOutput = {
+        $metadata: { httpStatusCode: 200 }
+    };
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -27,9 +31,11 @@ describe("Media Module", () => {
                 createdAt: new Date().toISOString()
             };
 
-            mockPutItem.mockResolvedValueOnce(undefined);
+            mockPutItem.mockResolvedValueOnce(mockPutCommandOutput);
 
-            await expect(createMedia(validMedia)).resolves.toBeUndefined();
+            await expect(createMedia(validMedia)).resolves.toEqual(
+                mockPutCommandOutput
+            );
             expect(mockPutItem).toHaveBeenCalledWith("Media", validMedia);
         });
 
@@ -74,9 +80,11 @@ describe("Media Module", () => {
                 createdAt: new Date().toISOString()
             };
 
-            mockPutItem.mockResolvedValueOnce(undefined);
+            mockPutItem.mockResolvedValueOnce(mockPutCommandOutput);
 
-            await expect(updateMedia(validMedia)).resolves.toBeUndefined();
+            await expect(updateMedia(validMedia)).resolves.toEqual(
+                mockPutCommandOutput
+            );
             expect(mockPutItem).toHaveBeenCalledWith("Media", validMedia);
         });
 
