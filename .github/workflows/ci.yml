@@ -32,6 +32,7 @@ jobs:
         with:
           node-version: 22
 
+      # Server
       - name: Install Dependencies (server)
         if: steps.filter.outputs.server == 'true'
         working-directory: server
@@ -40,7 +41,7 @@ jobs:
       - name: Run Quality Assurance (server)
         if: steps.filter.outputs.server == 'true'
         working-directory: server
-        run: npm run qc
+        run: NODE_ENV=test npm run qc
 
       - name: Coverage Report (server)
         if: steps.filter.outputs.server == 'true'
@@ -48,7 +49,17 @@ jobs:
         with:
           working-directory: server
 
-      # TODO add QC for client
+      # Client
+      - name: Install Dependencies (client)
+        if: steps.filter.outputs.client == 'true'
+        working-directory: client
+        run: npm install
+
+      - name: Run Quality Assurance (client)
+        if: steps.filter.outputs.client == 'true'
+        working-directory: client
+        run: NODE_ENV=test npm run qc
+
       - name: Coverage Report (client)
         if: steps.filter.outputs.client == 'true'
         uses: ArtiomTr/jest-coverage-report-action@v2

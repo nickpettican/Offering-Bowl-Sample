@@ -1,7 +1,10 @@
 import path from "path";
 import dotenv from "dotenv";
 
-dotenv.config({ path: path.resolve(__dirname, "../../.env.local") });
+dotenv.config({
+    path: path.resolve(__dirname, "../../.env.local"),
+    override: true
+});
 
 interface ENV {
     NODE_ENV: string | undefined;
@@ -32,6 +35,12 @@ interface Config {
 }
 
 const getEnvVars = (): ENV => {
+    if (process.env.NODE_ENV === "test") {
+        return {
+            NODE_ENV: "test"
+        } as ENV;
+    }
+
     return {
         NODE_ENV: process.env.NODE_ENV,
         PORT: process.env.PORT,
