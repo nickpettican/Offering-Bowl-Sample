@@ -9,7 +9,6 @@
     "services"
   ],
   "scripts": {
-    "prepare": "husky",
     "dev": "docker compose --env-file .env up --build",
     "build:dev": "docker compose --env-file .env build --no-cache",
     "dev:db": "docker compose --env-file .env up --build dynamodb-local db-initialiser"

@@ -90,11 +90,25 @@ Ensure the following are installed on our system:
     * Backend: http://localhost:SERVER_PORT
     * Frontend: http://localhost:CLIENT_PORT
 
+### Git Hooks
+
+This project uses [husky](https://typicode.github.io/husky/) for Git hooks to ensure code quality before commits. After cloning the repository and installing dependencies, you'll need to initialize husky:
+
+```bash
+# Install dependencies first
+npm ci
+
+# Initialize husky
+npx husky install
+```
+
+> **Note**: If you don't initialize husky, Git hooks won't run and you may commit code that doesn't meet the project's quality standards.
+
 ### Database set-up
 
 For development we use the Docker image `amazon/dynamodb-local:2.5.3`.
 
-If we run `docker compose` it will automatically be set up.
+If we run `docker compose` it will automatically be set up (see Docker section bellow).
 
 In dev, however, to create the tables in the database for now we have to use `services/db-initialiser`. See the README there for more information.
 
