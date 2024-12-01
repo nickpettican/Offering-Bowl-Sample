@@ -18,7 +18,7 @@ infra/
 ├── bin/
 │   └── app.ts           # CDK app entry point
 ├── lib/
-│   ├── constructs/      
+│   ├── constructs/
 │   │   └── database.ts  # DynamoDB tables construct
 │   └── stacks/
 │       └── main-stack.ts # Main infrastructure stack
@@ -37,6 +37,7 @@ infra/
 ### Database Tables
 
 The following DynamoDB tables are defined in `constructs/database.ts`:
+
 - Users (with role-index GSI)
 - Settings (with userId-index GSI)
 - Profile (with userId-index GSI)
@@ -51,12 +52,14 @@ The following DynamoDB tables are defined in `constructs/database.ts`:
 ### First Time Setup
 
 1. Install dependencies:
+
 ```bash
 cd infra
 npm install
 ```
 
 2. Bootstrap CDK (first time only):
+
 ```bash
 cdk bootstrap
 ```
@@ -64,11 +67,13 @@ cdk bootstrap
 ### Deploying to Production
 
 Deploy the entire stack:
+
 ```bash
 cdk deploy
 ```
 
 This will:
+
 1. Create/update all DynamoDB tables
 2. Set up the EC2 instance with Docker
 3. Configure the Application Load Balancer
@@ -77,6 +82,7 @@ This will:
 ### Cost Optimization
 
 The infrastructure is designed to use AWS free tier resources:
+
 - EC2: t2.micro instance (750 hours/month free for 12 months)
 - Application Load Balancer (750 hours/month free for 12 months)
 - DynamoDB: On-demand pricing (minimal costs for low traffic)
@@ -85,6 +91,7 @@ The infrastructure is designed to use AWS free tier resources:
 ### Future Scaling
 
 When ready to scale beyond free tier:
+
 1. Migrate to ECS for better container orchestration
 2. Add auto-scaling groups for EC2 instances
 3. Implement CloudWatch alarms for scaling triggers
@@ -94,12 +101,13 @@ When ready to scale beyond free tier:
 ### Common Issues
 
 1. DynamoDB Tables not creating locally:
-   - Check Docker logs: `docker compose logs dynamodb-local`
-   - Verify port mappings in docker-compose.yml
+
+    - Check Docker logs: `docker compose logs dynamodb-local`
+    - Verify port mappings in docker-compose.yml
 
 2. EC2 instance not starting:
-   - Check instance logs in AWS Console
-   - Verify security group settings
+    - Check instance logs in AWS Console
+    - Verify security group settings
 
 ### Useful Commands
 
@@ -119,12 +127,12 @@ aws dynamodb list-tables --endpoint-url http://localhost:8000
 
 #### Other useful commands
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+- `npm run build` compile typescript to js
+- `npm run watch` watch for changes and compile
+- `npm run test` perform the jest unit tests
+- `npx cdk deploy` deploy this stack to your default AWS account/region
+- `npx cdk diff` compare deployed stack with current state
+- `npx cdk synth` emits the synthesized CloudFormation template
 
 ## Security
 
