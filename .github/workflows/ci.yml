@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  checks: write
+
 jobs:
   build-and-test:
     name: Run Quality Control
@@ -36,35 +39,43 @@ jobs:
       - name: Install Dependencies (server)
         if: steps.filter.outputs.server == 'true'
         working-directory: server
-        run: npm install
+        run: npm ci
 
       - name: Run Quality Assurance (server)
         if: steps.filter.outputs.server == 'true'
         working-directory: server
         run: NODE_ENV=test npm run qc
 
+      # TODO finish implementation
       # - name: Coverage Report (server)
       #   if: steps.filter.outputs.server == 'true'
       #   uses: ArtiomTr/jest-coverage-report-action@v2
       #   with:
       #     working-directory: server
+      #     coverage-file: ./coverage/coverage-final.json
+      #     base-coverage-file: ./coverage/coverage-final.json
+      #     skip-step: all
 
       # Client
-      # - name: Install Dependencies (client)
-      #   if: steps.filter.outputs.client == 'true'
-      #   working-directory: client
-      #   run: npm install
+      - name: Install Dependencies (client)
+        if: steps.filter.outputs.client == 'true'
+        working-directory: client
+        run: npm ci
 
-      # - name: Run Quality Assurance (client)
-      #   if: steps.filter.outputs.client == 'true'
-      #   working-directory: client
-      #   run: NODE_ENV=test npm run qc
+      - name: Run Quality Assurance (client)
+        if: steps.filter.outputs.client == 'true'
+        working-directory: client
+        run: NODE_ENV=test npm run qc
 
+      # TODO finish implementation
       # - name: Coverage Report (client)
       #   if: steps.filter.outputs.client == 'true'
       #   uses: ArtiomTr/jest-coverage-report-action@v2
       #   with:
       #     working-directory: client
+      #     coverage-file: ./coverage/coverage-final.json
+      #     base-coverage-file: ./coverage/coverage-final.json
+      #     skip-step: all
 
   docker-deploy:
     name: Build and Deploy to Docker Hub
