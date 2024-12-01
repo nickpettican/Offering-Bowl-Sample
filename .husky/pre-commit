@@ -1,3 +1,5 @@
 cd server && npm run qc;
 cd ..;
 cd client && npm run qc;
+cd ..;
+cd infra && npm run qc;
