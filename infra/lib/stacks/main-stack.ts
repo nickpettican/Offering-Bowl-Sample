@@ -17,9 +17,30 @@ import { DatabaseConstruct } from "../constructs/database";
 import { SecurityConstruct } from "../constructs/security";
 import { DnsCdnConstruct } from "../constructs/dns-cdn";
 
+interface EnvironmentConfig {
+    removalPolicy: cdk.RemovalPolicy;
+    instanceType: ec2.InstanceType;
+}
+
+// Extend the StackProps interface
+interface InfraStackProps extends cdk.StackProps {
+    stagingConfig?: EnvironmentConfig;
+    productionConfig?: EnvironmentConfig;
+}
+
 export class InfraStack extends cdk.Stack {
-    constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+    constructor(scope: Construct, id: string, props?: InfraStackProps) {
         super(scope, id, props);
+
+        // Use the config in the stack
+        const config = props?.stagingConfig ||
+            props?.productionConfig || {
+                removalPolicy: cdk.RemovalPolicy.RETAIN,
+                instanceType: ec2.InstanceType.of(
+                    ec2.InstanceClass.T2,
+                    ec2.InstanceSize.MICRO
+                )
+            };
 
         // Create security construct
         const security = new SecurityConstruct(this, "Security");
@@ -72,7 +93,7 @@ export class InfraStack extends cdk.Stack {
         // S3 buckets
         const websiteBucket = new s3.Bucket(this, "WebsiteBucket", {
             blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-            removalPolicy: cdk.RemovalPolicy.RETAIN,
+            removalPolicy: config.removalPolicy,
             encryption: s3.BucketEncryption.S3_MANAGED
         });
 
@@ -87,7 +108,7 @@ export class InfraStack extends cdk.Stack {
                         s3.HttpMethods.PUT,
                         s3.HttpMethods.POST
                     ],
-                    allowedOrigins: ["*"], // You should restrict this in production
+                    allowedOrigins: ["*"], // TODO: restrict this in production
                     allowedHeaders: ["*"]
                 }
             ]
@@ -207,10 +228,7 @@ export class InfraStack extends cdk.Stack {
         // EC2 Instance in private subnet
         const ec2Instance = new ec2.Instance(this, "ApiInstance", {
             vpc,
-            instanceType: ec2.InstanceType.of(
-                ec2.InstanceClass.T2,
-                ec2.InstanceSize.MICRO
-            ),
+            instanceType: config.instanceType,
             machineImage: new ec2.AmazonLinuxImage({
                 generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2
             }),

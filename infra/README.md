@@ -47,6 +47,89 @@ The following DynamoDB tables are defined in `constructs/database.ts`:
 - Receipts (with contractId-index GSI)
 - Media
 
+## Testing and Staging
+
+### Development/Testing Workflow
+
+You can safely deploy and tear down the infrastructure for testing:
+
+1. Deploy staging environment:
+
+```bash
+cdk deploy StagingStack
+```
+
+2. Test the infrastructure
+
+3. Tear down when done:
+
+```bash
+cdk destroy StagingStack
+```
+
+### Environment Management
+
+The infrastructure supports multiple environments:
+
+- **Staging**: For testing infrastructure changes
+
+    - Uses `RemovalPolicy.DESTROY` for easy cleanup
+    - Same setup as production but allows easy teardown
+    - Perfect for testing autoscaling configurations
+
+- **Production**: Live environment
+
+    - Uses `RemovalPolicy.RETAIN` for data protection
+    - More restricted security settings
+    - Changes require careful planning
+
+### Scaling Scenarios
+
+The infrastructure is designed to evolve with your needs:
+
+1. **Initial Setup** (Current)
+
+    - Single t2.micro EC2 instance
+    - Two Docker containers with ALB
+    - Perfect for prototype/MVP phase
+
+2. **Autoscaling Ready**
+
+    - When high usage notifications arrive:
+    - Infrastructure code for autoscaling is prepared
+    - Can switch from single EC2 to autoscaling group
+    - Allows testing autoscaling in staging first
+
+### Migration Process
+
+When ready to implement autoscaling:
+
+1. Test in staging:
+
+    - Deploy autoscaling configuration
+    - Verify scaling behaviors
+    - Test monitoring and alerts
+    - Practice rollback procedures
+
+2. Production migration:
+
+    - Take snapshot of production EC2 for AMI
+    - Deploy autoscaling infrastructure
+    - Gradually move traffic over
+    - Maintain single EC2 until migration complete
+
+### Monitoring and Alerts
+
+The infrastructure includes CloudWatch alarms for:
+
+- CPU Usage (>80% threshold)
+- Request Count (>1000/minute threshold)
+- Notifications sent to configured email addresses
+
+This helps identify when to consider scaling up the infrastructure.
+
+Remember to accept the initial SNS subscription email to receive alerts.
+
 ## Deployment
 
 ### First Time Setup
@@ -106,6 +189,7 @@ When ready to scale beyond free tier:
     - Verify port mappings in docker-compose.yml
 
 2. EC2 instance not starting:
+
     - Check instance logs in AWS Console
     - Verify security group settings
 
