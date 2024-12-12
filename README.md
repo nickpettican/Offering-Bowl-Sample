@@ -1,16 +1,32 @@
-# Offering Bowl
+# Offering Bowl (Sample Repository)
 
-Offering Bowl is a platform designed to connect Buddhist monastics with patrons who can sponsor them through one-time or recurring donations. Inspired by platforms like Patreon, Offering Bowl focuses exclusively on the unique needs of monastics, providing a space for updates, messages, and sponsorship opportunities.
+> ⚠️ **Note**: This is a public sample repository that demonstrates the technical architecture and initial implementation of the Offering Bowl platform. The live production version is maintained in a private repository with additional features and security measures.
+
+This repository serves as a technical demonstration and reference implementation. If you're interested in contributing to the actual Offering Bowl platform, please:
+
+1. Contact [nickpettican](https://github.com/nickpettican) directly
+2. Include your GitHub username and areas of expertise
+3. Specify which aspects of the platform you'd like to contribute to
+
+The core platform includes enhanced features, security measures, and optimizations not present in this sample implementation.
 
 ---
 
-## Features
+## About Offering Bowl
 
-- **Monastics' Profiles**: Monastics can share updates, post images, and manage their sponsorships.
-- **Sponsorships**: Patrons can provide one-time or recurring support.
-- **Secure Donations**: Integrates with Stripe for secure transactions.
-- **Private Messaging**: Communication between patrons and monastics.
-- **Media Storage**: Support for images and videos uploaded by monastics.
+Offering Bowl is a platform designed to connect Buddhist monastics with patrons who can sponsor them through one-time or recurring donations. Inspired by platforms like Patreon, Offering Bowl focuses exclusively on the unique needs of monastics, providing a space for updates, messages, and sponsorship opportunities.
+
+## Demo Implementation Features
+
+This sample repository demonstrates:
+
+- Basic monastic profile structure
+- Sponsorship system architecture
+- Authentication flow
+- Database schema design
+- Infrastructure setup
+- Docker containerization
+- CI/CD pipeline configuration
 
 ---
 
@@ -251,6 +267,19 @@ The workflow is set up to only build the respective application if there are cha
 
 ---
 
+## Repository Status
+
+This sample repository:
+- ✅ Demonstrates core architecture
+- ✅ Shows basic implementation
+- ✅ Includes development setup
+- ✅ Provides infrastructure code
+- ❌ Does not include production features
+- ❌ Does not include sensitive configurations
+- ❌ Does not contain live data models
+
+---
+
 ## Contributing
 
 We welcome contributions to this non-profit project!
@@ -272,3 +301,7 @@ For questions or support, please contact:
 * [nickpettican](https://github.com/nickpettican)
 
 * [offering-bowl](https://github.com/nickpettican/offering-bowl)
+
+---
+
+**Reminder**: For access to the production repository and to contribute to the actual Offering Bowl platform, please reach out directly rather than forking this sample repository.
